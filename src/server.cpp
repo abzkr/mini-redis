@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <unistd.h>     // for close()
 
 #define PORT "6379"
 #define BACKLOG 10
@@ -31,11 +32,9 @@ int server() {
     char buff [20];
     ssize_t lenbuff = sizeof buff;
     
-    // error codes
-    int recv_status;
-    int send_status;
+    int recv_bytes;
+    int send_bytes;
     int exit_status;
-    
     int sockfd, connecfd;
     
     
@@ -89,20 +88,23 @@ int server() {
         inet_ntop(client_addr.ss_family, get_in_addr(clientaddrptr), client_addr_s, sizeof client_addr_s);
         std::cout << "Incoming connection from: " << client_addr_s << '\n';
 
-        while((recv_status = recv(connecfd, &buff, lenbuff, 0)) > 0){
+        while((recv_bytes = recv(connecfd, &buff, lenbuff-1, 0)) > 0){
             std::cout << buff << '\n';
-            if( (send_status = send(connecfd, &buff, lenbuff, 0)) >= 0){
+            buff[recv_bytes] = '\0';
+            
+            if( (send_bytes = send(connecfd, &buff, recv_bytes, 0)) >= 0){
                 std::cout << "Message sent to client!" << '\n';
             }
-            else if (send_status < 0){
-                std::cerr << "Error sending data: " << send_status << '\n';
+            else if (send_bytes < 0){
+                std::cerr << "Error sending data: " << send_bytes << '\n';
             }
+
         }
-        if(recv_status == 0){
+        if(recv_bytes == 0){
             std::cout << "Client closed their connection to the server " << '\n';
         }
-        else if(recv_status < 0){
-            std::cerr << "Error recieving data: " << recv_status << '\n';
+        else if(recv_bytes < 0){
+            std::cerr << "Error recieving data: " << recv_bytes << '\n';
         }
 
         
@@ -112,7 +114,40 @@ int server() {
 }
 
 
+
 int main () {
+
+    int server_status;
+
+    /*
+
+    Theres an issue with recv() and send()
+    understand how the buffer actually functions 
+
+    It should only echo back the last message sent
+    What it does instead is -> After a few messages
+    from the client, the server responds with some
+    padding/characters 
+
+    Fix by null terminating - its a C thing
+    to say that we've come to the end of the string
+
+
+
+    Hello  -> Client message
+    Hello  -> Server echo
+    erver is runn -> echo from previous session
+
+    Hello We are testing the server
+    Hello We are testing the server
+    testing
+    
+    Server testing one two three
+    Server testing one two three
+    ting one t
+
+    
+    */ 
     return server();
 
 }
