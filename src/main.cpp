@@ -1,11 +1,13 @@
 #include <iostream>
-#include <cstring>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+#include "server.h"
+#include "parser.h"
 
 
 int main() {
+
+    
+    server();
+    
 
     return 0;
 }
