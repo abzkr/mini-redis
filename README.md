@@ -19,6 +19,7 @@ Commands:
 ```bash
 SET user abzkr 
 GET user
+DEL user
 ```
 
 ## Limitations
