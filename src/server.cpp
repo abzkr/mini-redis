@@ -5,6 +5,9 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <unordered_map>
+#include "parser.h"
+#include <sstream>
 
 #define PORT "6379"
 #define BACKLOG 10
@@ -48,6 +51,7 @@ int server() {
     // Error checking getaddrinfo
     if((exit_status = getaddrinfo(NULL, PORT, &hints , &res)) != EXIT_SUCCESS ){
         std::cerr << stderr << ' ' << gai_strerror(exit_status);
+        return 1;
     }
     
     struct addrinfo *ptr;
@@ -83,15 +87,19 @@ int server() {
 
     // Creating sockets for each new connection
     while((connecfd = accept(sockfd, clientaddrptr, &client_addr_size)) >= 0){
-                
+
         inet_ntop(client_addr.ss_family, get_in_addr(clientaddrptr), client_addr_s, sizeof client_addr_s);
         std::cout << "Incoming connection from: " << client_addr_s << '\n';
 
-        while((recv_bytes = recv(connecfd, buff, lenbuff-1, 0)) > 0){
-            buff[recv_bytes] = '\0';
-            std::cout << buff << '\n';
+        std::unordered_map <std::string, std::string> kv;
 
-            if( (send_bytes = send(connecfd, buff, recv_bytes, 0)) >= 0){
+        while((recv_bytes = recv(connecfd, buff, lenbuff-1, 0)) > 0){
+            std::string response = parser(buff, kv);
+            buff[recv_bytes] = '\0';
+
+            if( (send_bytes = send(connecfd, response.c_str(), response.size(), 0)) >= 0){
+                response[recv_bytes] = '\0';
+                
                 std::cout << "Message sent to client!" << '\n';
             }
             else if (send_bytes < 0){
@@ -99,16 +107,17 @@ int server() {
             }
 
         }
-        if(recv_bytes == 0){
+        
+        if (recv_bytes == 0){
             std::cout << "Client closed their connection to the server " << '\n';
         }
-        else if(recv_bytes < 0){
+        else if ( recv_bytes < 0 ){
             std::cerr << "Error recieving data: " << recv_bytes << '\n';
         }
-
         
     }
-    
+
+
     return 0;
 }
 

@@ -3,24 +3,36 @@
 #include <sstream>
 #include <unordered_map>
 
-/*
-Checklist 
-1) Understand how std;;strings work
-2) "SET USER ABE" - User:ABE -> std::unordered_map kv_store 
-3) "GET USER" -> Retrieve it from kv_store -> Returns ABE
-4) "DEL USER" -> Delete abe
-5) 
-*/
 
-int max_char;
+std::string parser(char command_msg[4096], std::unordered_map<std::string , std::string> &kv_store) {
 
-int parser(std::string command_msg, std::unordered_map<std::string, int> kv_store) {
-    
+
+    std::string command;
+    std::string key;
+    std::string value;
+
     std::stringstream command_stream (command_msg);
+    command_stream >> command;
 
-    std::string get = "GET";
-    std::string set = "SET";
-    std::string del = "DEL";
+    if (command == "SET") {
+        command_stream >> key;
+        command_stream >> value;
+        kv_store.insert({key,value});
+        return "OK\n";
+    }
+    else if (command == "GET"){
+        command_stream >> key;
+        auto it = kv_store.find(key);
+        if(it != kv_store.end()) return it->second + '\n';
+    }
+    else if (command == "DEL"){
+        command_stream >> key;
+        auto it = kv_store.find(key);
+        if(it != kv_store.end()) kv_store.erase(key);
+        return "OK\n" ;
+    }
 
-    return 0 ;
+    return "ERROR'\n";
 }
+
+
