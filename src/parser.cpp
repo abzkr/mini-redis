@@ -20,18 +20,18 @@ std::string parser(char command_msg[4096], std::unordered_map<std::string , std:
         kv_store.insert({key,value});
         return "OK\n";
     }
-    else if (command == "GET"){
+    else if (command == "GET") {
         command_stream >> key;
         auto it = kv_store.find(key);
         if(it != kv_store.end()) return it->second + '\n';
-    }
-    else if (command == "DEL"){
+    } 
+    else if (command == "DEL") {
         command_stream >> key;
         auto it = kv_store.find(key);
         if(it != kv_store.end()) kv_store.erase(key);
         return "OK\n" ;
     }
-
+  
     return "ERROR'\n";
 }
 
