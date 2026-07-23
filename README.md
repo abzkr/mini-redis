@@ -6,7 +6,7 @@ Currently implements a key-value storage system with a parser that works with SE
 ## Features
 - TCP echo server: accepts client connections and handles low-level socket communication
 - Command parser: supports SET, GET and DEL.
-- Single client support: handles one client connection at a time  
+- Multiple client support: handles up to 10 client connections at a time  
 
 
 ## Usage
@@ -23,12 +23,11 @@ DEL user
 ```
 
 ## Limitations
-- No concurrency (single client only)
-- No persistence 
+- No data persistence 
 - No authentication or security features
 - Limited command set
 
 
 ## Current Project Status
-The project currently implements a basic command parser that works via TCP and is capable of accepting single client connections.  
-More commands, concurrency and persistence are planned next.
+The project currently implements a basic command parser that works via TCP and is capable of accepting and handling up to 10 client connections.
+RESP implementation and persistence are planned next.
