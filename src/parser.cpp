@@ -17,7 +17,7 @@ std::string parser(char command_msg[4096], std::unordered_map<std::string , std:
     if (command == "SET") {
         command_stream >> key;
         command_stream >> value;
-        kv_store.insert({key,value});
+        kv_store[key] = value;
         return "OK\n";
     }
     else if (command == "GET") {
@@ -32,7 +32,7 @@ std::string parser(char command_msg[4096], std::unordered_map<std::string , std:
         return "OK\n" ;
     }
   
-    return "ERROR'\n";
+    return "ERROR\n";
 }
 
 
