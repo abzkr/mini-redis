@@ -4,9 +4,9 @@ A mini in-memory key-value store database written in C++ inspired by Redis.
 Currently implements a key-value storage system with a parser that works with SET, GET and DEL commands via TCP.
 
 ## Features
-- TCP echo server: accepts client connections and handles low-level socket communication
+- TCP server: accepts client connections and handles low-level socket communication
 - Command parser: supports SET, GET and DEL.
-- Multiple client support: handles up to 10 client connections at a time  
+- Multiple client support: uses an epoll() instance and event loop to handle up to 10 client connections at a time  
 
 
 ## Usage
@@ -26,6 +26,7 @@ DEL user
 - No data persistence 
 - No authentication or security features
 - Limited command set
+- No performance benchmarking
 
 
 ## Current Project Status
